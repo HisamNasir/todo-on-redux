@@ -1,36 +1,48 @@
-import { decremented, incremented } from "@/src/store/features/counterSlice";
-import Head from "next/head";
-import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
+import TodoItem from "@/src/store/components/TodoItem";
+import { useSelector, useDispatch } from "react-redux";
+import { addTodo, removeTodo } from "@/src/store/features/todoSlice";
 
-export default function Home() {
-  const { value } = useSelector((state) => state.counter);
+function App() {
+  const [input, setInput] = useState("");
+
+  const count = useSelector((state) => state.todo.count);
+  const todos = useSelector((state) => state.todo.todos);
   const dispatch = useDispatch();
 
-  return (
-    <>
-      <Head>
-        <title>Boilerplate</title>
-      </Head>
+  const handleAddTodo = (e) => {
+    e.preventDefault();
+    dispatch(addTodo(input));
+  };
 
-      <main>
-        <h1 className="text-xl lg:text-6xl text-center my-10 uppercase tracking-[2px]">
-          Hello {value}
-        </h1>
-        <div className="flex justify-center gap-x-8 items-center">
-          <button
-            onClick={() => dispatch(incremented())}
-            className="bg-black text-white px-12 py-2 text-2xl rounded-lg"
-          >
-            +
-          </button>
-          <button
-            onClick={() => dispatch(decremented())}
-            className="bg-black text-white px-12 py-2 text-2xl rounded-lg"
-          >
-            -
-          </button>
-        </div>
-      </main>
-    </>
+  const handleTodoDone = (id) => {
+    dispatch(removeTodo(id));
+  };
+  return (
+    <div className="App flex justify-center py-10 h-full">
+      <div className=" text-center border p-4 border-black rounded-xl">
+      <h1 className="font-semibold text-3xl text-gray-700 m-2">TODO List</h1>
+      <form className="App-form flex  w-80" onSubmit={handleAddTodo}>
+        <input className=" focus:outline-none w-full px-2 border border-black rounded-l-xl" type="text" onInput={(e) => setInput(e.target.value)} />
+        <button className=" hover:bg-slate-200 px-10 rounded-r-xl border  border-black" type="submit">+</button>
+      </form>
+      <div className="Todos w-full border border-black rounded-xl mt-2 divide-y">
+        {count > 0 &&
+          todos.map((todo) => (
+            <TodoItem
+              key={todo.id}
+              text={todo.text}
+              id={todo.id}
+              onCheck={handleTodoDone}
+            />
+          ))}
+        {count === 0 && <p>No todos</p>}
+      </div> 
+      </div>
+
+    </div>
+   
   );
 }
+
+export default App;
